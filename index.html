@@ -70,12 +70,14 @@
 </body>
 <script type="text/babel">
     function TimeboxEditor(props) {
-        const { 
-            title, 
+        const {
+            title,
             totalTimeInMinutes,
-            onTitleChange, 
-            onTimeInMinutesChange 
-            } = props;
+            onTitleChange,
+            onTimeInMinutesChange,
+            onStartClick,
+            isRunning
+        } = props;
         return (
             <div className="TimeboxEditor">
                 <label>
@@ -98,10 +100,7 @@
                     />
                 </label>
                 <br />
-                <button
-                    disabled={false}>
-                    Zacznij
-                </button>
+                <button onClick={onStartClick} disabled={isRunning}>Start</button>
             </div>
         )
     }
@@ -122,33 +121,56 @@
         );
     }
 
-    class Timebox extends React.Component {
-        constructor(props) {
-            super(props);
-            this.state = {
-                isRunning: false,
-                isPaused: false,
-                pausesCount: 0,
-                elapsedTimeInSeconds: 0
-            }
-            this.handleStart = this.handleStart.bind(this)
-            this.handleStop = this.handleStop.bind(this)
-            this.togglePause = this.togglePause.bind(this)
+    function Timebox(props) {
+        const {
+            title,
+            totalTimeInMinutes,
+            onStartClick,
+            elapsedTimeInSeconds,
+            isRunning,
+            isPaused,
+            pausesCount,
+            onStopClick,
+            onPauseClick
+        } = props;
+        const totalTimeInSeconds = totalTimeInMinutes * 60;
+        const timeLeftInSeconds = totalTimeInSeconds - elapsedTimeInSeconds;
+        const minutesLeft = Math.floor(timeLeftInSeconds / 60);
+        const secondsLeft = Math.floor(timeLeftInSeconds % 60);
+        const progressInPercent = (elapsedTimeInSeconds / totalTimeInSeconds) * 100.0;
+        return (
+            <div className="Timebox">
+                <h1>{title}</h1>
+                <Clock minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""} />
+                <ProgressBar percent={progressInPercent} className={isPaused ? "inactive" : ""} />
+                <button onClick={onStartClick} disabled={isRunning}>Start</button>
+                <button onClick={onStopClick} disabled={!isRunning}>Stop</button>
+                <button onClick={onPauseClick} disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
+                    Liczba przerw: {pausesCount}
+            </div>
+        )
+    }
+
+    class EditableTimebox extends React.Component {
+        state = {
+            title: "Uczę się wyciągać stan w górę",
+            totalTimeInMinutes: 12,
+            isRunning: false,
+            elapsedTimeInSeconds: 0,
+            isPaused: false,
+            pausesCount: 0,
         }
-        handleStart(event) {
+        handleTitleChange = (event) => {
+            this.setState({ title: event.target.value })
+        }
+        handleTimeInMinutesChange = (event) => {
+            this.setState({ totalTimeInMinutes: event.target.value })
+        }
+        handleStart = () => {
             this.setState({
                 isRunning: true
             })
             this.startTimer();
-        }
-        handleStop(event) {
-            this.setState({
-                isRunning: false,
-                isPaused: false,
-                pausesCount: 0,
-                elapsedTimeInSeconds: 25
-            });
-            this.stopTimer();
         }
         startTimer() {
             this.intervalId = window.setInterval(
@@ -160,10 +182,19 @@
                 100
             );
         }
+        handleStop = (event) => {
+            this.setState({
+                isPaused: false,
+                pausesCount: 0,
+                elapsedTimeInSeconds: 0,
+                isRunning: false
+            });
+            this.stopTimer();
+        }
         stopTimer() {
             window.clearInterval(this.intervalId);
         }
-        togglePause() {
+        togglePause = () => {
             this.setState(
                 function (prevState) {
                     const isPaused = !prevState.isPaused;
@@ -180,40 +211,14 @@
             )
         }
         render() {
-            const { isPaused, isRunning, pausesCount, elapsedTimeInSeconds } = this.state;
-            const { title, totalTimeInMinutes } = this.props;
-            const totalTimeInSeconds = totalTimeInMinutes * 60;
-            const timeLeftInSeconds = totalTimeInSeconds - elapsedTimeInSeconds;
-            const minutesLeft = Math.floor(timeLeftInSeconds / 60);
-            const secondsLeft = Math.floor(timeLeftInSeconds % 60);
-            const progressInPercent = (elapsedTimeInSeconds / totalTimeInSeconds) * 100.0;
-            return (
-                <div className="Timebox">
-                    <h1>{title}</h1>
-                    <Clock minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""} />
-                    <ProgressBar percent={progressInPercent} className={isPaused ? "inactive" : ""} />
-                    <button onClick={this.handleStart} disabled={isRunning}>Start</button>
-                    <button onClick={this.handleStop} disabled={!isRunning}>Stop</button>
-                    <button onClick={this.togglePause} disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
-                    Liczba przerw: {pausesCount}
-                </div>
-            )
-        }
-    }
-
-    class EditableTimebox extends React.Component {
-        state = {
-            title: "Uczę się wyciągać stan w górę",
-            totalTimeInMinutes: 12
-        }
-        handleTitleChange = (event) => {
-            this.setState({ title: event.target.value })
-        }
-        handleTimeInMinutesChange = (event) => {
-            this.setState({ totalTimeInMinutes: event.target.value })
-        }
-        render() {
-            const { title, totalTimeInMinutes } = this.state;
+            const {
+                title,
+                totalTimeInMinutes,
+                isRunning,
+                elapsedTimeInSeconds,
+                isPaused,
+                pausesCount
+            } = this.state;
             return (
                 <>
                     <TimeboxEditor
@@ -221,8 +226,20 @@
                         totalTimeInMinutes={totalTimeInMinutes}
                         onTitleChange={this.handleTitleChange}
                         onTimeInMinutesChange={this.handleTimeInMinutesChange}
+                        onStartClick={this.handleStart}
+                        isRunning={isRunning}
                     />
-                    <Timebox title={title} totalTimeInMinutes={totalTimeInMinutes} />
+                    <Timebox
+                        title={title}
+                        totalTimeInMinutes={totalTimeInMinutes}
+                        isRunning={isRunning}
+                        onStartClick={this.handleStart}
+                        elapsedTimeInSeconds={elapsedTimeInSeconds}
+                        isPaused={isPaused}
+                        pausesCount={pausesCount}
+                        onStopClick={this.handleStop}
+                        onPauseClick={this.togglePause}
+                    />
                 </>
             )
         }
