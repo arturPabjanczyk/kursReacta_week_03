@@ -134,22 +134,19 @@
                 pausesCount: 0,
                 elapsedTimeInSeconds: 0
             }
-            this.handleStart = this.handleStart.bind(this)
-            this.handleStop = this.handleStop.bind(this)
-            this.togglePause = this.togglePause.bind(this)
         }
-        handleStart(event) {
+        handleStart = (event) => {
             this.setState({
                 isRunning: true
             })
             this.startTimer();
         }
-        handleStop(event) {
+        handleStop = (event) => {
             this.setState({
                 isRunning: false,
                 isPaused: false,
                 pausesCount: 0,
-                elapsedTimeInSeconds: 25
+                elapsedTimeInSeconds: 0
             });
             this.stopTimer();
         }
@@ -166,7 +163,7 @@
         stopTimer() {
             window.clearInterval(this.intervalId);
         }
-        togglePause() {
+        togglePause = () => {
             this.setState(
                 function (prevState) {
                     const isPaused = !prevState.isPaused;
