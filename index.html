@@ -184,17 +184,18 @@
         }
         render() {
             const { isPaused, isRunning, pausesCount, elapsedTimeInSeconds } = this.state;
-            const { title, totalTimeInMinutes } = this.props;
+            const { title, totalTimeInMinutes, isEditable, onEdit } = this.props;
             const totalTimeInSeconds = totalTimeInMinutes * 60;
             const timeLeftInSeconds = totalTimeInSeconds - elapsedTimeInSeconds;
             const minutesLeft = Math.floor(timeLeftInSeconds / 60);
             const secondsLeft = Math.floor(timeLeftInSeconds % 60);
             const progressInPercent = (elapsedTimeInSeconds / totalTimeInSeconds) * 100.0;
             return (
-                <div className="Timebox">
+                <div className={`Timebox ${isEditable ? "inactive" : ""}`}>
                     <h1>{title}</h1>
                     <Clock minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""} />
                     <ProgressBar percent={progressInPercent} className={isPaused ? "inactive" : ""} />
+                    <button onClick={onEdit} disabled={isEditable}>Edytuj</button>
                     <button onClick={this.handleStart} disabled={isRunning}>Start</button>
                     <button onClick={this.handleStop} disabled={!isRunning}>Stop</button>
                     <button onClick={this.togglePause} disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
@@ -221,6 +222,11 @@
                 isEditable: false
             })
         }
+        handleEdit = (event) => {
+            this.setState({
+                isEditable: true
+            })
+        }
         render() {
             const { title, totalTimeInMinutes, isEditable } = this.state;
             return (
@@ -233,7 +239,13 @@
                         onTimeInMinutesChange={this.handleTimeInMinutesChange}
                         onConfirm={this.handleConfirm}
                     />
-                    <Timebox title={title} totalTimeInMinutes={totalTimeInMinutes} />
+                    <Timebox
+                        title={title}
+                        totalTimeInMinutes={totalTimeInMinutes}
+                        isEditable={isEditable}
+                        onEdit={this.handleEdit}
+                        
+                    />
                 </>
             )
         }
