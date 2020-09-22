@@ -23,6 +23,14 @@
             margin-bottom: 20px;
         }
 
+        .Timebox {
+            border: 1px solid gray;
+            border-radius: 5px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+
         input {
             min-width: 60%;
             margin-left: 20px;
@@ -277,16 +285,28 @@
 
         render() {
             return (
-                <TimeboxCreator />
+                <>
+                    <TimeboxCreator />
+                    <Timebox title="title1" totalTimeInMinutes="12" />
+                    <Timebox title="title2" totalTimeInMinutes="13" />
+                    <Timebox title="title3" totalTimeInMinutes="14" />
+                </>
             )
         }
+    }
+    function Timebox({ title, totalTimeInMinutes }) {
+        return (
+            <div className="Timebox">
+                <h3>{title} - {totalTimeInMinutes} min.</h3>
+            </div>
+        )
     }
 
     function App() {
         return (
             <div className="App">
                 {/* <EditableTimebox */}
-                <TimeboxCreator />
+                <TimeboxList />
             </div>
         )
     }
