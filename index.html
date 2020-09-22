@@ -14,7 +14,8 @@
             font-family: sans-serif;
         }
 
-        .TimeboxEditor {
+        .TimeboxEditor,
+        .TimeboxCreator {
             text-align: right;
             border: 1px solid gray;
             border-radius: 5px;
@@ -33,7 +34,7 @@
             margin-left: 10px;
         }
 
-        .Timebox {
+        .CurrentTimebox {
             border: 1px solid gray;
             border-radius: 5px;
             padding: 20px;
@@ -125,7 +126,7 @@
         );
     }
 
-    class Timebox extends React.Component {
+    class CurrentTimebox extends React.Component {
         constructor(props) {
             super(props);
             this.state = {
@@ -188,7 +189,7 @@
             const secondsLeft = Math.floor(timeLeftInSeconds % 60);
             const progressInPercent = (elapsedTimeInSeconds / totalTimeInSeconds) * 100.0;
             return (
-                <div className={`Timebox ${isEditable ? "inactive" : ""}`}>
+                <div className={`CurrentTimebox ${isEditable ? "inactive" : ""}`}>
                     <h1>{title}</h1>
                     <Clock minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""} />
                     <ProgressBar percent={progressInPercent} className={isPaused ? "inactive" : ""} />
@@ -236,14 +237,47 @@
                         onTimeInMinutesChange={this.handleTimeInMinutesChange}
                         onConfirm={this.handleConfirm}
                     />
-                    <Timebox
+                    <CurrentTimebox
                         title={title}
                         totalTimeInMinutes={totalTimeInMinutes}
                         isEditable={isEditable}
                         onEdit={this.handleEdit}
-                        
+
                     />
                 </>
+            )
+        }
+    }
+
+    function TimeboxCreator(props) {
+        return (
+            <div className="TimeboxCreator">
+                <label>
+                    Co robisz?
+                    <input
+                        type="text"
+                    />
+                </label>
+                <br />
+                <label>
+                    Ile minut?
+                    <input
+                        type="number"
+                    />
+                </label>
+                <br />
+                <button>
+                    Dodaj timebox
+                </button>
+            </div>
+        )
+    }
+
+    class TimeboxList extends React.Component {
+
+        render() {
+            return (
+                <TimeboxCreator />
             )
         }
     }
@@ -251,7 +285,8 @@
     function App() {
         return (
             <div className="App">
-                <EditableTimebox />
+                {/* <EditableTimebox */}
+                <TimeboxCreator />
             </div>
         )
     }
