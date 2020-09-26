@@ -304,6 +304,8 @@
                             key={index}
                             title={timeBox.title}
                             totalTimeInMinutes={timeBox.totalTimeInMinutes}
+                            onDelete={() => console.log("Usuwam timeBox ", index)}
+                            onEdit={() => console.log("Edytuję timeBox ", index)}
                         />
                     ))}
                 </>
@@ -315,6 +317,8 @@
         return (
             <div className="TimeBox">
                 <h3>{title} - {totalTimeInMinutes} min.</h3>
+                <button onClick={onDelete}>Delete</button>
+                <button onClick={onEdit}>Edit</button>
             </div>
         )
     }
