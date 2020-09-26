@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="ie=edge" http-equiv="X-UA-Compatible"/>
     <title>Kurs Reacta - Tydzień 3</title>
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         .App {
@@ -61,7 +60,7 @@
             padding: 5px;
         }
 
-        .ProgressBar>div {
+        .ProgressBar > div {
             height: 100%;
             background-color: orangered;
         }
@@ -71,11 +70,10 @@
         }
     </style>
 </head>
-
 <body>
-    <h1>Kurs Reacta Tydzień 3</h1>
-    <hr />
-    <div id="root"></div>
+<h1>Kurs Reacta Tydzień 3</h1>
+<hr/>
+<div id="root"></div>
 </body>
 <script type="text/babel">
     function TimeboxEditor(props) {
@@ -98,7 +96,7 @@
                         onChange={onTitleChange}
                     />
                 </label>
-                <br />
+                <br/>
                 <label>
                     Ile minut?
                     <input
@@ -108,7 +106,7 @@
                         onChange={onTimeInMinutesChange}
                     />
                 </label>
-                <br />
+                <br/>
                 <button
                     onClick={onConfirm}
                     disabled={!isEditable}>
@@ -118,7 +116,7 @@
         )
     }
 
-    function Clock({ className = "", minutes = 20, seconds = 48 }) {
+    function Clock({className = "", minutes = 20, seconds = 48}) {
         return (
             <h2 className={"Clock " + className}>
                 Pozostało {minutes}:{seconds}
@@ -126,10 +124,10 @@
         );
     }
 
-    function ProgressBar({ className = "", percent = 33 }) {
+    function ProgressBar({className = "", percent = 33}) {
         return (
             <div className={"ProgressBar " + className}>
-                <div style={{ width: `${percent}%` }}></div>
+                <div style={{width: `${percent}%`}}></div>
             </div>
         );
     }
@@ -144,6 +142,7 @@
                 elapsedTimeInSeconds: 0
             }
         }
+
         handleStart = (event) => {
             this.setState({
                 isRunning: true
@@ -159,19 +158,22 @@
             });
             this.stopTimer();
         }
+
         startTimer() {
             this.intervalId = window.setInterval(
                 () => {
                     this.setState(
-                        prevState => ({ elapsedTimeInSeconds: prevState.elapsedTimeInSeconds + 0.1 })
+                        prevState => ({elapsedTimeInSeconds: prevState.elapsedTimeInSeconds + 0.1})
                     )
                 },
                 100
             );
         }
+
         stopTimer() {
             window.clearInterval(this.intervalId);
         }
+
         togglePause = () => {
             this.setState(
                 function (prevState) {
@@ -188,9 +190,10 @@
                 }
             )
         }
+
         render() {
-            const { isPaused, isRunning, pausesCount, elapsedTimeInSeconds } = this.state;
-            const { title, totalTimeInMinutes, isEditable, onEdit } = this.props;
+            const {isPaused, isRunning, pausesCount, elapsedTimeInSeconds} = this.state;
+            const {title, totalTimeInMinutes, isEditable, onEdit} = this.props;
             const totalTimeInSeconds = totalTimeInMinutes * 60;
             const timeLeftInSeconds = totalTimeInSeconds - elapsedTimeInSeconds;
             const minutesLeft = Math.floor(timeLeftInSeconds / 60);
@@ -199,8 +202,8 @@
             return (
                 <div className={`CurrentTimebox ${isEditable ? "inactive" : ""}`}>
                     <h1>{title}</h1>
-                    <Clock minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""} />
-                    <ProgressBar percent={progressInPercent} className={isPaused ? "inactive" : ""} />
+                    <Clock minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""}/>
+                    <ProgressBar percent={progressInPercent} className={isPaused ? "inactive" : ""}/>
                     <button onClick={onEdit} disabled={isEditable}>Edytuj</button>
                     <button onClick={this.handleStart} disabled={isRunning}>Start</button>
                     <button onClick={this.handleStop} disabled={!isRunning}>Stop</button>
@@ -218,10 +221,10 @@
             isEditable: true
         }
         handleTitleChange = (event) => {
-            this.setState({ title: event.target.value })
+            this.setState({title: event.target.value})
         }
         handleTimeInMinutesChange = (event) => {
-            this.setState({ totalTimeInMinutes: event.target.value })
+            this.setState({totalTimeInMinutes: event.target.value})
         }
         handleConfirm = (event) => {
             this.setState({
@@ -233,8 +236,9 @@
                 isEditable: true
             })
         }
+
         render() {
-            const { title, totalTimeInMinutes, isEditable } = this.state;
+            const {title, totalTimeInMinutes, isEditable} = this.state;
             return (
                 <>
                     <TimeboxEditor
@@ -266,14 +270,14 @@
                         type="text"
                     />
                 </label>
-                <br />
+                <br/>
                 <label>
                     Ile minut?
                     <input
                         type="number"
                     />
                 </label>
-                <br />
+                <br/>
                 <button>
                     Dodaj timebox
                 </button>
@@ -283,18 +287,27 @@
 
     class TimeboxList extends React.Component {
 
+        state = {
+            timeboxes: [
+                {title: "title1", totalTimeInMinutes: "13"},
+                {title: "title2", totalTimeInMinutes: "13"},
+                {title: "title3", totalTimeInMinutes: "14"}
+            ]
+        }
+
         render() {
             return (
                 <>
-                    <TimeboxCreator />
-                    <Timebox title="title1" totalTimeInMinutes="12" />
-                    <Timebox title="title2" totalTimeInMinutes="13" />
-                    <Timebox title="title3" totalTimeInMinutes="14" />
+                    <TimeboxCreator/>
+                    {this.state.timeboxes.map((timebox, index) => (
+                        <Timebox key={index} title={timebox.title} totalTimeInMinutes={timebox.totalTimeInMinutes}/>
+                    ))}
                 </>
             )
         }
     }
-    function Timebox({ title, totalTimeInMinutes }) {
+
+    function Timebox({title, totalTimeInMinutes}) {
         return (
             <div className="Timebox">
                 <h3>{title} - {totalTimeInMinutes} min.</h3>
@@ -306,12 +319,12 @@
         return (
             <div className="App">
                 {/* <EditableTimebox */}
-                <TimeboxList />
+                <TimeboxList/>
             </div>
         )
     }
 
-    ReactDOM.render(<App />, document.getElementById("root"));
+    ReactDOM.render(<App/>, document.getElementById("root"));
 </script>
 
 </html>
