@@ -261,25 +261,25 @@
         }
     }
 
-    function TimeBoxCreator(props) {
+    function TimeBoxCreator({onCreate}) {
         return (
             <div className="TimeBoxCreator">
                 <label>
-                    Co robisz?
+                    What are you doing?
                     <input
                         type="text"
                     />
                 </label>
                 <br/>
                 <label>
-                    Ile minut?
+                    How many minutes?
                     <input
                         type="number"
                     />
                 </label>
                 <br/>
-                <button>
-                    Dodaj timebox
+                <button onClick={onCreate}>
+                    Create timebox
                 </button>
             </div>
         )
@@ -294,11 +294,14 @@
                 {title: "title3", totalTimeInMinutes: "14"}
             ]
         }
+        handleCreate = () => {
+            console.log("Tworzę timebox");
+        }
 
         render() {
             return (
                 <>
-                    <TimeBoxCreator/>
+                    <TimeBoxCreator onCreate={this.handleCreate}/>
                     {this.state.timeBoxes.map((timeBox, index) => (
                         <TimeBox
                             key={index}
