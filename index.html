@@ -294,8 +294,23 @@
                 {title: "title3", totalTimeInMinutes: "14"}
             ]
         }
+
+        addTimeBox = (timeBox) => {
+            this.setState(prevState => {
+                const timeBoxes = [...prevState.timeBoxes, timeBox];
+                return {timeBoxes};
+            })
+        }
+
+        removeTimeBox = (indexToRemove) => {
+            this.setState(prevState => {
+                const timeBoxes = prevState.timeBoxes.filter((timeBox, index) => index !== indexToRemove)
+                return {timeBoxes};
+            })
+        }
+
         handleCreate = () => {
-            console.log("Tworzę timebox");
+            this.addTimeBox({title: "Nowy timebox", totalTimeInMinutes: 33})
         }
 
         render() {
@@ -307,7 +322,7 @@
                             key={index}
                             title={timeBox.title}
                             totalTimeInMinutes={timeBox.totalTimeInMinutes}
-                            onDelete={() => console.log("Usuwam timeBox ", index)}
+                            onDelete={() => this.removeTimeBox(index)}
                             onEdit={() => console.log("Edytuję timeBox ", index)}
                         />
                     ))}
