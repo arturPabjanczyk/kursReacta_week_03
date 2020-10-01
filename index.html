@@ -309,6 +309,15 @@
             })
         }
 
+        updateTimeBox = (indexToUpdate, updatedTimeBox) => {
+            this.setState(prevState => {
+                const timeBoxes = prevState.timeBoxes.map((timeBox, index) =>
+                    index === indexToUpdate ? updatedTimeBox : timeBox
+            )
+                return {timeBoxes};
+            })
+        }
+
         handleCreate = () => {
             this.addTimeBox({title: "Nowy timebox", totalTimeInMinutes: 33})
         }
@@ -323,7 +332,7 @@
                             title={timeBox.title}
                             totalTimeInMinutes={timeBox.totalTimeInMinutes}
                             onDelete={() => this.removeTimeBox(index)}
-                            onEdit={() => console.log("Edytuję timeBox ", index)}
+                            onEdit={() => this.updateTimeBox(index, {...timeBox, title: "Updated title"})}
                         />
                     ))}
                 </>
