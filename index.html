@@ -5,9 +5,10 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <meta content="ie=edge" http-equiv="X-UA-Compatible"/>
     <title>Kurs Reacta - Tydzień 3</title>
-    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"> crossorigin</script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.8/uuid.min.js"></script>
     <style>
         .App {
             font-family: sans-serif;
@@ -289,9 +290,9 @@
 
         state = {
             timeBoxes: [
-                {title: "title1", totalTimeInMinutes: "13"},
-                {title: "title2", totalTimeInMinutes: "13"},
-                {title: "title3", totalTimeInMinutes: "14"}
+                {id: uuid.v4(), title: "title1", totalTimeInMinutes: "13"},
+                {id: uuid.v4(), title: "title2", totalTimeInMinutes: "13"},
+                {id: uuid.v4(), title: "title3", totalTimeInMinutes: "14"}
             ]
         }
 
@@ -319,7 +320,7 @@
         }
 
         handleCreate = () => {
-            this.addTimeBox({title: "Nowy timebox", totalTimeInMinutes: 33})
+            this.addTimeBox({id: uuid.v4(), title: "Nowy timebox", totalTimeInMinutes: 33})
         }
 
         render() {
@@ -328,7 +329,7 @@
                     <TimeBoxCreator onCreate={this.handleCreate}/>
                     {this.state.timeBoxes.map((timeBox, index) => (
                         <TimeBox
-                            key={index}
+                            key={timeBox.id}
                             title={timeBox.title}
                             totalTimeInMinutes={timeBox.totalTimeInMinutes}
                             onDelete={() => this.removeTimeBox(index)}
