@@ -263,47 +263,65 @@
     }
 
     class TimeBoxCreator extends React.Component {
-        constructor(props) {
-            super(props);
-            this.titleInput = React.createRef();
-            this.totalTimeInMinutesInput = React.createRef();
+        state = {
+            title: "",
+            totalTimeInMinutes: ""
+        }
+        handleTitleChange = (event) => {
+            this.setState({title: event.target.value})
+        }
+        handleTimeInMinutesChange = (event) => {
+            this.setState({totalTimeInMinutes: event.target.value})
         }
         handleSubmit = (event) => {
             event.preventDefault();
             this.props.onCreate({
                 id: uuid.v4(),
-                title: this.titleInput.current.value,
-                totalTimeInMinutes: this.totalTimeInMinutesInput.current.value
+                title: this.state.title,
+                totalTimeInMinutes: this.state.totalTimeInMinutes
             });
-            this.titleInput.current.value = "";
-            this.totalTimeInMinutesInput.current.value = "";
+            this.setState({title: "", totalTimeInMinutes: ""})
         }
 
         render() {
             return (
-                <form onSubmit={this.handleSubmit} className="TimeBoxCreator">
-                    <label>
-                        What are you doing?
-                        <input
-                            ref={this.titleInput}
-                            type="text"
-                        />
-                    </label>
-                    <br/>
-                    <label>
-                        How many minutes?
-                        <input
-                            ref={this.totalTimeInMinutesInput}
-                            type="number"
-                        />
-                    </label>
-                    <br/>
-                    <button>
-                        Create timebox
-                    </button>
-                </form>
+                <CreateForm
+                    title={this.state.title}
+                    totalTimeInMinutes={this.state.totalTimeInMinutes}
+                    handleTitleChange={this.handleTitleChange}
+                    handleTimeInMinutesChange={this.handleTimeInMinutesChange}
+                    handleSubmit={this.handleSubmit}
+                />
             )
         }
+    }
+
+    function CreateForm ({title, totalTimeInMinutes, handleTitleChange, handleTimeInMinutesChange, handleSubmit}) {
+        return (
+            <form onSubmit={handleSubmit} className="TimeBoxCreator">
+                <label>
+                    What are you doing?
+                    <input
+                        value={title}
+                        onChange={handleTitleChange}
+                        type="text"
+                    />
+                </label>
+                <br/>
+                <label>
+                    How many minutes?
+                    <input
+                        value={totalTimeInMinutes}
+                        onChange={handleTimeInMinutesChange}
+                        type="number"
+                    />
+                </label>
+                <br/>
+                <button>
+                    Create timebox
+                </button>
+            </form>
+        )
     }
 
     class TimeBoxList extends React.Component {
