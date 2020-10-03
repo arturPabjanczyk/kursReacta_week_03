@@ -5,7 +5,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <meta content="ie=edge" http-equiv="X-UA-Compatible"/>
     <title>Kurs Reacta - Tydzień 3</title>
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"> crossorigin</script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.8/uuid.min.js"></script>
@@ -262,28 +262,54 @@
         }
     }
 
-    function TimeBoxCreator({onCreate}) {
-        return (
-            <div className="TimeBoxCreator">
-                <label>
-                    What are you doing?
-                    <input
-                        type="text"
-                    />
-                </label>
-                <br/>
-                <label>
-                    How many minutes?
-                    <input
-                        type="number"
-                    />
-                </label>
-                <br/>
-                <button onClick={onCreate}>
-                    Create timebox
-                </button>
-            </div>
-        )
+    class TimeBoxCreator extends React.Component {
+        state = {
+            title: "",
+            totalTimeInMinutes: ""
+        }
+        handleTitleChange = (event) => {
+            this.setState({title: event.target.value})
+        }
+        handleTimeInMinutesChange = (event) => {
+            this.setState({totalTimeInMinutes: event.target.value})
+        }
+        handleSubmit = (event) => {
+            event.preventDefault();
+            this.props.onCreate({
+                id: uuid.v4(),
+                title: this.state.title,
+                totalTimeInMinutes: this.state.totalTimeInMinutes
+            });
+            this.setState({title: "", totalTimeInMinutes: ""})
+        }
+
+        render() {
+            return (
+                <form onSubmit={this.handleSubmit} className="TimeBoxCreator">
+                    <label>
+                        What are you doing?
+                        <input
+                            value={this.state.title}
+                            onChange={this.handleTitleChange}
+                            type="text"
+                        />
+                    </label>
+                    <br/>
+                    <label>
+                        How many minutes?
+                        <input
+                            value={this.state.totalTimeInMinutes}
+                            onChange={this.handleTimeInMinutesChange}
+                            type="number"
+                        />
+                    </label>
+                    <br/>
+                    <button>
+                        Create timebox
+                    </button>
+                </form>
+            )
+        }
     }
 
     class TimeBoxList extends React.Component {
@@ -298,7 +324,7 @@
 
         addTimeBox = (timeBox) => {
             this.setState(prevState => {
-                const timeBoxes = [...prevState.timeBoxes, timeBox];
+                const timeBoxes = [timeBox, ...prevState.timeBoxes];
                 return {timeBoxes};
             })
         }
@@ -314,13 +340,13 @@
             this.setState(prevState => {
                 const timeBoxes = prevState.timeBoxes.map((timeBox, index) =>
                     index === indexToUpdate ? updatedTimeBox : timeBox
-            )
+                )
                 return {timeBoxes};
             })
         }
 
-        handleCreate = () => {
-            this.addTimeBox({id: uuid.v4(), title: "Nowy timebox", totalTimeInMinutes: 33})
+        handleCreate = (createdTimeBox) => {
+            this.addTimeBox(createdTimeBox)
         }
 
         render() {
