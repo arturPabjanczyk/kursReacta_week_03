@@ -77,6 +77,62 @@
 <div id="root"></div>
 </body>
 <script type="text/babel">
+    function App() {
+        return (
+            <div className="App">
+                {/* <EditableTimeBox */}
+                <TimeBoxList/>
+            </div>
+        )
+    }
+
+    class EditableTimeBox extends React.Component {
+        state = {
+            title: "Uczę się wyciągać stan w górę",
+            totalTimeInMinutes: 12,
+            isEditable: true
+        }
+        handleTitleChange = (event) => {
+            this.setState({title: event.target.value})
+        }
+        handleTimeInMinutesChange = (event) => {
+            this.setState({totalTimeInMinutes: event.target.value})
+        }
+        handleConfirm = (event) => {
+            this.setState({
+                isEditable: false
+            })
+        }
+        handleEdit = (event) => {
+            this.setState({
+                isEditable: true
+            })
+        }
+
+        render() {
+            const {title, totalTimeInMinutes, isEditable} = this.state;
+            return (
+                <>
+                    <TimeBoxEditor
+                        title={title}
+                        totalTimeInMinutes={totalTimeInMinutes}
+                        isEditable={isEditable}
+                        onTitleChange={this.handleTitleChange}
+                        onTimeInMinutesChange={this.handleTimeInMinutesChange}
+                        onConfirm={this.handleConfirm}
+                    />
+                    <CurrentTimeBox
+                        title={title}
+                        totalTimeInMinutes={totalTimeInMinutes}
+                        isEditable={isEditable}
+                        onEdit={this.handleEdit}
+
+                    />
+                </>
+            )
+        }
+    }
+
     function TimeBoxEditor(props) {
         const {
             title,
@@ -215,48 +271,56 @@
         }
     }
 
-    class EditableTimeBox extends React.Component {
+    class TimeBoxList extends React.Component {
+
         state = {
-            title: "Uczę się wyciągać stan w górę",
-            totalTimeInMinutes: 12,
-            isEditable: true
+            timeBoxes: [
+                {id: uuid.v4(), title: "title1", totalTimeInMinutes: "13"},
+                {id: uuid.v4(), title: "title2", totalTimeInMinutes: "13"},
+                {id: uuid.v4(), title: "title3", totalTimeInMinutes: "14"}
+            ]
         }
-        handleTitleChange = (event) => {
-            this.setState({title: event.target.value})
-        }
-        handleTimeInMinutesChange = (event) => {
-            this.setState({totalTimeInMinutes: event.target.value})
-        }
-        handleConfirm = (event) => {
-            this.setState({
-                isEditable: false
+
+        addTimeBox = (timeBox) => {
+            this.setState(prevState => {
+                const timeBoxes = [timeBox, ...prevState.timeBoxes];
+                return {timeBoxes};
             })
         }
-        handleEdit = (event) => {
-            this.setState({
-                isEditable: true
+
+        removeTimeBox = (indexToRemove) => {
+            this.setState(prevState => {
+                const timeBoxes = prevState.timeBoxes.filter((timeBox, index) => index !== indexToRemove)
+                return {timeBoxes};
             })
+        }
+
+        updateTimeBox = (indexToUpdate, updatedTimeBox) => {
+            this.setState(prevState => {
+                const timeBoxes = prevState.timeBoxes.map((timeBox, index) =>
+                    index === indexToUpdate ? updatedTimeBox : timeBox
+                )
+                return {timeBoxes};
+            })
+        }
+
+        handleCreate = (createdTimeBox) => {
+            this.addTimeBox(createdTimeBox)
         }
 
         render() {
-            const {title, totalTimeInMinutes, isEditable} = this.state;
             return (
                 <>
-                    <TimeBoxEditor
-                        title={title}
-                        totalTimeInMinutes={totalTimeInMinutes}
-                        isEditable={isEditable}
-                        onTitleChange={this.handleTitleChange}
-                        onTimeInMinutesChange={this.handleTimeInMinutesChange}
-                        onConfirm={this.handleConfirm}
-                    />
-                    <CurrentTimeBox
-                        title={title}
-                        totalTimeInMinutes={totalTimeInMinutes}
-                        isEditable={isEditable}
-                        onEdit={this.handleEdit}
-
-                    />
+                    <TimeBoxCreator onCreate={this.handleCreate}/>
+                    {this.state.timeBoxes.map((timeBox, index) => (
+                        <TimeBox
+                            key={timeBox.id}
+                            title={timeBox.title}
+                            totalTimeInMinutes={timeBox.totalTimeInMinutes}
+                            onDelete={() => this.removeTimeBox(index)}
+                            onEdit={() => this.updateTimeBox(index, {...timeBox, title: "Updated title"})}
+                        />
+                    ))}
                 </>
             )
         }
@@ -324,76 +388,12 @@
         )
     }
 
-    class TimeBoxList extends React.Component {
-
-        state = {
-            timeBoxes: [
-                {id: uuid.v4(), title: "title1", totalTimeInMinutes: "13"},
-                {id: uuid.v4(), title: "title2", totalTimeInMinutes: "13"},
-                {id: uuid.v4(), title: "title3", totalTimeInMinutes: "14"}
-            ]
-        }
-
-        addTimeBox = (timeBox) => {
-            this.setState(prevState => {
-                const timeBoxes = [timeBox, ...prevState.timeBoxes];
-                return {timeBoxes};
-            })
-        }
-
-        removeTimeBox = (indexToRemove) => {
-            this.setState(prevState => {
-                const timeBoxes = prevState.timeBoxes.filter((timeBox, index) => index !== indexToRemove)
-                return {timeBoxes};
-            })
-        }
-
-        updateTimeBox = (indexToUpdate, updatedTimeBox) => {
-            this.setState(prevState => {
-                const timeBoxes = prevState.timeBoxes.map((timeBox, index) =>
-                    index === indexToUpdate ? updatedTimeBox : timeBox
-                )
-                return {timeBoxes};
-            })
-        }
-
-        handleCreate = (createdTimeBox) => {
-            this.addTimeBox(createdTimeBox)
-        }
-
-        render() {
-            return (
-                <>
-                    <TimeBoxCreator onCreate={this.handleCreate}/>
-                    {this.state.timeBoxes.map((timeBox, index) => (
-                        <TimeBox
-                            key={timeBox.id}
-                            title={timeBox.title}
-                            totalTimeInMinutes={timeBox.totalTimeInMinutes}
-                            onDelete={() => this.removeTimeBox(index)}
-                            onEdit={() => this.updateTimeBox(index, {...timeBox, title: "Updated title"})}
-                        />
-                    ))}
-                </>
-            )
-        }
-    }
-
     function TimeBox({title, totalTimeInMinutes, onDelete, onEdit}) {
         return (
             <div className="TimeBox">
                 <h3>{title} - {totalTimeInMinutes} min.</h3>
                 <button onClick={onDelete}>Delete</button>
                 <button onClick={onEdit}>Edit</button>
-            </div>
-        )
-    }
-
-    function App() {
-        return (
-            <div className="App">
-                {/* <EditableTimeBox */}
-                <TimeBoxList/>
             </div>
         )
     }
