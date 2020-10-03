@@ -285,31 +285,43 @@
 
         render() {
             return (
-                <form onSubmit={this.handleSubmit} className="TimeBoxCreator">
-                    <label>
-                        What are you doing?
-                        <input
-                            value={this.state.title}
-                            onChange={this.handleTitleChange}
-                            type="text"
-                        />
-                    </label>
-                    <br/>
-                    <label>
-                        How many minutes?
-                        <input
-                            value={this.state.totalTimeInMinutes}
-                            onChange={this.handleTimeInMinutesChange}
-                            type="number"
-                        />
-                    </label>
-                    <br/>
-                    <button>
-                        Create timebox
-                    </button>
-                </form>
+                <CreateForm
+                    title={this.state.title}
+                    totalTimeInMinutes={this.state.totalTimeInMinutes}
+                    handleTitleChange={this.handleTitleChange}
+                    handleTimeInMinutesChange={this.handleTimeInMinutesChange}
+                    handleSubmit={this.handleSubmit}
+                />
             )
         }
+    }
+
+    function CreateForm ({title, totalTimeInMinutes, handleTitleChange, handleTimeInMinutesChange, handleSubmit}) {
+        return (
+            <form onSubmit={handleSubmit} className="TimeBoxCreator">
+                <label>
+                    What are you doing?
+                    <input
+                        value={title}
+                        onChange={handleTitleChange}
+                        type="text"
+                    />
+                </label>
+                <br/>
+                <label>
+                    How many minutes?
+                    <input
+                        value={totalTimeInMinutes}
+                        onChange={handleTimeInMinutesChange}
+                        type="number"
+                    />
+                </label>
+                <br/>
+                <button>
+                    Create timebox
+                </button>
+            </form>
+        )
     }
 
     class TimeBoxList extends React.Component {
