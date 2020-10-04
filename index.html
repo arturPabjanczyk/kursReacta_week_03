@@ -275,11 +275,20 @@
 
         state = {
             isEdited: false,
+            title: "",
+            totalTimeInMinutes: "",
             timeBoxes: [
                 {id: uuid.v4(), title: "title1", totalTimeInMinutes: "13"},
                 {id: uuid.v4(), title: "title2", totalTimeInMinutes: "13"},
                 {id: uuid.v4(), title: "title3", totalTimeInMinutes: "14"}
             ]
+        }
+
+        handleTitleChange = (changedTitle) => {
+            this.setState({title: changedTitle})
+        }
+        handleTimeInMinutesChange = (changedTimeInMinutesChange) => {
+            this.setState({totalTimeInMinutes: changedTimeInMinutesChange})
         }
 
         addTimeBox = (timeBox) => {
@@ -311,17 +320,31 @@
 
         handleEdit = (index, updatedTimeBox) => {
             this.setState({
-                isEdited: true
+                title: updatedTimeBox.title,
+                totalTimeInMinutes: updatedTimeBox.totalTimeInMinutes
+            }, () => {
+                console.log("TimeBoxList 1", this.state);
+                this.setState({
+                    isEdited: true,
+                }, () => {
+                    console.log("TimeBoxList 2", this.state)
+                })
             })
             // this.updateTimeBox(updatedTimeBox, index)
         }
 
         render() {
-            const {isEdited} = this.state;
+            const {isEdited, title, totalTimeInMinutes} = this.state;
             return (
                 <>
                     {isEdited ?
-                        <TimeBoxUpdater onConfirm={this.handleEdit}/> :
+                        <TimeBoxUpdater
+                            title={title}
+                            totalTimeInMinutes={totalTimeInMinutes}
+                            onConfirm={this.handleEdit}
+                            handleTitleChange={this.handleTitleChange}
+                            handleTimeInMinutesChange={this.handleTimeInMinutesChange}
+                        /> :
                         <TimeBoxCreator onConfirm={this.handleCreate}/>}
                     {this.state.timeBoxes.map((timeBox, index) => (
                         <TimeBox
@@ -330,7 +353,7 @@
                             totalTimeInMinutes={timeBox.totalTimeInMinutes}
                             onDelete={() => this.removeTimeBox(index)}
                             onEdit={() => {
-                                this.handleEdit(index, {...timeBox, title: "Updated title"});
+                                this.handleEdit(index, timeBox);
                             }}
                         />
                     ))}
@@ -375,15 +398,11 @@
     }
 
     class TimeBoxUpdater extends React.Component {
-        state = {
-            title: this.props.title,
-            totalTimeInMinutes: this.props.totalTimeInMinutes
-        }
         handleTitleChange = (event) => {
-            this.setState({title: event.target.value})
+            this.handleTitleChange(event.target.value)
         }
         handleTimeInMinutesChange = (event) => {
-            this.setState({totalTimeInMinutes: event.target.value})
+            this.handleTimeInMinutesChange(event.target.value)
         }
         handleSubmit = (event) => {
             event.preventDefault();
@@ -395,15 +414,19 @@
         }
 
         render() {
-            console.log("TimeBoxUpdater ", this.state)
             return (
-                <TimeBoxForm
-                    title={this.state.title}
-                    totalTimeInMinutes={this.state.totalTimeInMinutes}
-                    handleTitleChange={this.handleTitleChange}
-                    handleTimeInMinutesChange={this.handleTimeInMinutesChange}
-                    handleSubmit={this.handleSubmit}
-                />
+                <>
+                    <h3>
+                        Editing: {this.props.title}
+                    </h3>
+                    <TimeBoxForm
+                        title={this.props.title}
+                        totalTimeInMinutes={this.props.totalTimeInMinutes}
+                        handleTitleChange={this.handleTitleChange}
+                        handleTimeInMinutesChange={this.handleTimeInMinutesChange}
+                        handleSubmit={this.handleSubmit}
+                    />
+                </>
             )
         }
     }
