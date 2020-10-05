@@ -99,14 +99,10 @@
             this.setState({totalTimeInMinutes: event.target.value})
         }
         handleConfirm = (event) => {
-            this.setState({
-                isEditable: false
-            })
+            this.setState({isEditable: false})
         }
         handleEdit = (event) => {
-            this.setState({
-                isEditable: true
-            })
+            this.setState({isEditable: true})
         }
 
         render() {
@@ -201,9 +197,7 @@
         }
 
         handleStart = (event) => {
-            this.setState({
-                isRunning: true
-            })
+            this.setState({isRunning: true})
             this.startTimer();
         }
         handleStop = (event) => {
@@ -274,6 +268,8 @@
     class TimeBoxList extends React.Component {
 
         state = {
+            editedTimeBox: {},
+            index: 0,
             isEdited: false,
             title: "",
             totalTimeInMinutes: "",
@@ -305,12 +301,14 @@
             })
         }
 
-        updateTimeBox = (indexToUpdate, updatedTimeBox) => {
+        updateTimeBox = (index, updatedTimeBox) => {
             this.setState(prevState => {
                 const timeBoxes = prevState.timeBoxes.map((timeBox, index) =>
-                    index === indexToUpdate ? updatedTimeBox : timeBox
+                    index === this.state.index ? updatedTimeBox : timeBox
                 )
                 return {timeBoxes};
+            }, () => {
+                this.setState({isEdited: false})
             })
         }
 
@@ -318,43 +316,36 @@
             this.addTimeBox(createdTimeBox)
         }
 
-        handleEdit = (index, updatedTimeBox) => {
+        handleEdit = (index, editedTimeBox) => {
             this.setState({
-                title: updatedTimeBox.title,
-                totalTimeInMinutes: updatedTimeBox.totalTimeInMinutes
+                index: index,
+                editedTimeBox: editedTimeBox,
             }, () => {
-                console.log("TimeBoxList 1", this.state);
                 this.setState({
                     isEdited: true,
-                }, () => {
-                    console.log("TimeBoxList 2", this.state)
                 })
             })
-            // this.updateTimeBox(updatedTimeBox, index)
         }
 
         render() {
-            const {isEdited, title, totalTimeInMinutes} = this.state;
+            const {index, isEdited, title, totalTimeInMinutes, editedTimeBox} = this.state;
             return (
                 <>
                     {isEdited ?
                         <TimeBoxUpdater
-                            title={title}
-                            totalTimeInMinutes={totalTimeInMinutes}
-                            onConfirm={this.handleEdit}
+                            index={index}
+                            editedTimeBox={editedTimeBox}
+                            onConfirm={this.updateTimeBox}
                             handleTitleChange={this.handleTitleChange}
                             handleTimeInMinutesChange={this.handleTimeInMinutesChange}
                         /> :
                         <TimeBoxCreator onConfirm={this.handleCreate}/>}
-                    {this.state.timeBoxes.map((timeBox, index) => (
+                    {!isEdited && this.state.timeBoxes.map((timeBox, index) => (
                         <TimeBox
                             key={timeBox.id}
-                            title={timeBox.title}
-                            totalTimeInMinutes={timeBox.totalTimeInMinutes}
+                            timeBox={timeBox}
                             onDelete={() => this.removeTimeBox(index)}
-                            onEdit={() => {
-                                this.handleEdit(index, timeBox);
-                            }}
+                            onEdit={() => this.handleEdit(index, timeBox)}
                         />
                     ))}
                 </>
@@ -384,44 +375,15 @@
         }
 
         render() {
-            console.log("TimeBoxCreator ", this.state)
-            return (
-                <TimeBoxForm
-                    title={this.state.title}
-                    totalTimeInMinutes={this.state.totalTimeInMinutes}
-                    handleTitleChange={this.handleTitleChange}
-                    handleTimeInMinutesChange={this.handleTimeInMinutesChange}
-                    handleSubmit={this.handleSubmit}
-                />
-            )
-        }
-    }
-
-    class TimeBoxUpdater extends React.Component {
-        handleTitleChange = (event) => {
-            this.handleTitleChange(event.target.value)
-        }
-        handleTimeInMinutesChange = (event) => {
-            this.handleTimeInMinutesChange(event.target.value)
-        }
-        handleSubmit = (event) => {
-            event.preventDefault();
-            this.props.onUpdate({
-                id: uuid.v4(),
-                title: this.state.title,
-                totalTimeInMinutes: this.state.totalTimeInMinutes
-            });
-        }
-
-        render() {
+            const {title, totalTimeInMinutes} = this.state;
             return (
                 <>
                     <h3>
-                        Editing: {this.props.title}
+                        Creating new timeBox.
                     </h3>
                     <TimeBoxForm
-                        title={this.props.title}
-                        totalTimeInMinutes={this.props.totalTimeInMinutes}
+                        title={title}
+                        totalTimeInMinutes={totalTimeInMinutes}
                         handleTitleChange={this.handleTitleChange}
                         handleTimeInMinutesChange={this.handleTimeInMinutesChange}
                         handleSubmit={this.handleSubmit}
@@ -431,7 +393,54 @@
         }
     }
 
-    function TimeBoxForm({title, totalTimeInMinutes, handleTitleChange, handleTimeInMinutesChange, handleSubmit}) {
+    class TimeBoxUpdater extends React.Component {
+        state = {
+            index: this.props.index,
+            updatedTimeBox: this.props.editedTimeBox,
+            titleInput: this.props.editedTimeBox.title,
+            totalTimeInMinutesInput: this.props.editedTimeBox.totalTimeInMinutes,
+        }
+        handleTitleChange = (event) => {
+            this.setState({titleInput: event.target.value})
+        }
+        handleTimeInMinutesChange = (event) => {
+            this.setState({totalTimeInMinutesInput: event.target.value})
+        }
+        handleSubmit = () => {
+            this.setState(prevState => ({
+                updatedTimeBox: {
+                    ...prevState.updatedTimeBox,
+                    title: this.state.titleInput,
+                    totalTimeInMinutes: this.state.totalTimeInMinutesInput
+                }
+            }), () => {
+                this.props.onConfirm(
+                    this.state.index,
+                    this.state.updatedTimeBox
+                )
+            })
+        }
+
+        render() {
+            const {titleInput, totalTimeInMinutesInput, updatedTimeBox} = this.state;
+            return (
+                <>
+                    <h3>
+                        Editing: {updatedTimeBox.title}
+                    </h3>
+                    <TimeBoxForm
+                        title={titleInput}
+                        totalTimeInMinutes={totalTimeInMinutesInput}
+                        handleTitleChange={this.handleTitleChange}
+                        handleTimeInMinutesChange={this.handleTimeInMinutesChange}
+                        handleSubmit={this.handleSubmit}
+                    />
+                </>
+            )
+        }
+    }
+
+    function TimeBoxForm({handleTimeInMinutesChange, handleTitleChange, handleSubmit, title, totalTimeInMinutes}) {
         return (
             <form onSubmit={handleSubmit} className="TimeBoxCreator">
                 <label>
@@ -465,10 +474,10 @@
         }
 
         render() {
-            const {title, totalTimeInMinutes, onDelete, onEdit} = this.props;
+            const {onDelete, onEdit, timeBox} = this.props;
             return (
                 <div className="TimeBox">
-                    <h3>{title} - {totalTimeInMinutes} min.</h3>
+                    <h3>{timeBox.title} - {timeBox.totalTimeInMinutes} min.</h3>
                     <button onClick={onDelete}>Delete</button>
                     <button onClick={onEdit}>Edit
                     </button>
